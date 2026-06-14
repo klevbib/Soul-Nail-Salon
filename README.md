@@ -1,6 +1,5 @@
 # Soul-Nail-Salon
 
-
 # Soul Nail Salon — Website MVP Plan
 
 ## Goal
@@ -35,14 +34,14 @@ A simple, elegant static website for a new nail salon with two core sections: a 
 
 ## Tech Stack
 
-| Choice          | Reason                                                      |
-| --------------- | ----------------------------------------------------------- |
-| React + Vite    | Fast dev setup, component-based, easy to scale              |
-| React Router    | Client-side routing between pages                           |
-| Tailwind CSS    | Utility-first styling, easy to customise per component      |
-| No backend      | Static site, all data hardcoded for MVP                     |
+| Choice     | Reason                                                         |
+| ---------- | -------------------------------------------------------------- |
+| HTML       | Simple, no build step, easy to hand off or host anywhere       |
+| CSS        | Hand-written styles, full control, no dependencies             |
+| JavaScript | Vanilla JS for interactivity (filter, lightbox, smooth scroll) |
+| No backend | Static site, all data hardcoded for MVP                        |
 
-> **Future path:** Migrate to Next.js if SEO or server-side rendering becomes a priority (e.g. for Google ranking).
+> **Future path:** Migrate to a framework (React, Next.js) if the site grows in complexity or SEO becomes a priority.
 
 ---
 
@@ -50,24 +49,17 @@ A simple, elegant static website for a new nail salon with two core sections: a 
 
 ```
 /
-├── index.html              # Vite entry point
-├── package.json
-├── vite.config.js
-├── src/
-│   ├── main.jsx            # React root
-│   ├── App.jsx             # Router setup
-│   ├── pages/
-│   │   ├── Home.jsx        # Hero + Portfolio
-│   │   └── About.jsx       # About page
-│   ├── components/
-│   │   ├── Navbar.jsx
-│   │   ├── Hero.jsx
-│   │   ├── PortfolioGrid.jsx
-│   │   ├── PortfolioCard.jsx
-│   │   └── Footer.jsx
-│   └── assets/
-│       ├── portfolio/      # Nail art photos
-│       └── about/          # Salon / stylist photos
+├── index.html              # Homepage (Hero + Portfolio)
+├── about.html              # About page
+├── css/
+│   ├── style.css           # Global styles and layout
+│   └── portfolio.css       # Portfolio grid and lightbox styles
+├── js/
+│   ├── main.js             # Shared behaviour (navbar, smooth scroll)
+│   └── portfolio.js        # Filter and lightbox logic
+└── assets/
+    ├── portfolio/           # Nail art photos
+    └── about/               # Salon / stylist photos
 ```
 
 ---
