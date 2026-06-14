@@ -5,12 +5,29 @@
 *.ntvs*
 *.njsproj
 *.sln
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Environment variables
 .env
 .env.local
 .env.*.local
+
+# Node (if using npm tools like a dev server, bundler, linter)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build output (if using a bundler like Webpack/Vite/Parcel)
+dist/
+build/
+
+# Claude Code
+.claude/
