@@ -313,6 +313,15 @@ h2.separator{
     line-height: 1.5;
 }
 
+.hours-row{
+    display: flex;
+    gap: 8px;
+}
+
+.hours-day{
+    min-width: 90px;
+}
+
 .panel-section .detail i{
     font-size: 20px;
     color: #C25B3D;
