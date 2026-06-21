@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Portfolio — Soul Nail Salon</title>
+    <script src="js/transitions.js" defer></script>
+</head>
+
+<body>
+
+    <div class="top-banner">
+        <p>Now booking appointments — <a href="tel:07962930379">call 07962930379</a> or walk in today</p>
+        <button class="banner-close" onclick="this.parentElement.style.display='none'">&times;</button>
+    </div>
+
+    <nav>
+        <a href="index.html" class="logo"> <img src="assets/other/logo_transparent.png" alt="Nail Salon"> </a>
+        <div class="links">
+            <a href="index.html">Home</a>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="about.html">About Us</a>
+        </div>
+    </nav>
+
+    <div class="portfolio-header">
+        <h1>Our Portfolio</h1>
+        <div class="portfolio-filters">
+            <button class="filter-btn active" data-filter="all" onclick="filterGallery('all')">All</button>
+            <button class="filter-btn" data-filter="manicure" onclick="filterGallery('manicure')">Manicure</button>
+<button class="filter-btn" data-filter="nail-art" onclick="filterGallery('nail-art')">Nail Art</button>
+            <button class="filter-btn" data-filter="gel" onclick="filterGallery('gel')">Gel</button>
+            <button class="filter-btn" data-filter="acrylic" onclick="filterGallery('acrylic')">Acrylic</button>
+        </div>
+    </div>
+
+    <div class="gallery-grid">
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-1.png')">
+            <img src="assets/portfolio/nail-art-1.png" alt="Cow Print Nail Art">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-1.png')">
+            <img src="assets/portfolio/gel-1.png" alt="Swirl Gel Manicure">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-2.png')">
+            <img src="assets/portfolio/nail-art-2.png" alt="Summer Nail Art">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-3.png')">
+            <img src="assets/portfolio/nail-art-3.png" alt="Retro Swirl Nail Art">
+        </div>
+
+        <div class="gallery-item" data-category="manicure" onclick="openLightbox('assets/portfolio/manicure-1.png')">
+            <img src="assets/portfolio/manicure-1.png" alt="French Tip with Hearts">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-4.png')">
+            <img src="assets/portfolio/nail-art-4.png" alt="Mixed Nail Art Set">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-2.png')">
+            <img src="assets/portfolio/gel-2.png" alt="Crystal Gel Nails">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-3.png')">
+            <img src="assets/portfolio/gel-3.png" alt="Marble Gel Manicure">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-5.png')">
+            <img src="assets/portfolio/nail-art-5.png" alt="Graphic French Tips">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-6.png')">
+            <img src="assets/portfolio/nail-art-6.png" alt="Geometric Nail Art">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-7.png')">
+            <img src="assets/portfolio/nail-art-7.png" alt="Blue Smiley Nails">
+        </div>
+
+        <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-8.png')">
+            <img src="assets/portfolio/nail-art-8.png" alt="Floral Swirl Nails">
+        </div>
+
+        <div class="gallery-item" data-category="acrylic" onclick="openLightbox('assets/portfolio/acrylic-1.png')">
+            <img src="assets/portfolio/acrylic-1.png" alt="Rhinestone Acrylic Set">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-4.png')">
+            <img src="assets/portfolio/gel-4.png" alt="Festive Gel Set">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-5.png')">
+            <img src="assets/portfolio/gel-5.png" alt="Pink Chrome French">
+        </div>
+
+        <div class="gallery-item" data-category="gel" onclick="openLightbox('assets/portfolio/gel-6.png')">
+            <img src="assets/portfolio/gel-6.png" alt="Iridescent Butterfly Gel">
+        </div>
+
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <footer>
+        <div class="footer-main">
+            <div class="footer-brand">
+                <img src="assets/other/logo_transparent.png" alt="Soul Nail Salon">
+                <p>Caring for your nails with passion and precision. Visit us in the heart of Altrincham for a truly soulful experience.</p>
+                <div class="footer-socials">
+                    <a href="https://www.instagram.com/soul_nails_1109" target="_blank" aria-label="Instagram" class="social-instagram"><i class="bx bxl-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h5>Contact</h5>
+                <ul class="footer-contact">
+                    <li>
+                        <i class="bx bx-map-pin"></i>
+                        <span>1 Peter St, Altrincham WA14 2DZ</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-phone"></i>
+                        <span>07962930379</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-envelope"></i>
+                        <span>hello@soulnailsalon.com.au</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-time-five"></i>
+                        <span>Mon – Fri: 9am – 7pm<br>Sat: 9am – 6pm<br>Sun: 10am – 5pm</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Soul Nail Salon. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function filterGallery(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === category);
+            });
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                const show = category === 'all' || item.dataset.category === category;
+                item.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function handleLightboxClick(e) {
+            if (e.target === document.getElementById('lightbox')) closeLightbox();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+</body>
+
+</html>

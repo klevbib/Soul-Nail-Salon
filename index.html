@@ -7,44 +7,258 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/style.css">
     <title>Soul Nail Salon</title>
+    <script src="js/transitions.js" defer></script>
 </head>
 
 <body>
+
+    <div class="top-banner">
+        <p>Now booking appointments — <a href="tel:07962930379">call 07962930379</a> or walk in today</p>
+        <button class="banner-close" onclick="this.parentElement.style.display='none'">&times;</button>
+    </div>
 
     <nav>
         <a href="#" class="logo"> <img src="assets/other/logo_transparent.png" alt="Nail Salon"> </a>
         <div class="links">
             <a href="#">Home</a>
-            <a href="#">Portfolio</a>
-            <a href="#">About us</a>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="about.html">About Us</a>
         </div>
     </nav>
 
     <header>
         <div class="left">
-            <h1>Welcome to <span>Soul Nail Salon.</span></h1>
+            <h1>Welcome to <span>Soul Nail Salon</span></h1>
             <p>We provide the best nail care services in town. Our team of skilled professionals is dedicated to making your nails look fabulous.</p>
-            <a href="#">
+            <a href="portfolio.html">
                 <i class="bx bx-book" /></i>
-                <span>See our Portfolio.</span>
+                <span>See our Portfolio</span>
             </a>
         </div>
         <img src="assets/other/logo_transparent.png" alt="Nail Salon">
     </header>
 
+    <hr class="section-divider">
+
     <h2 class="separator">
-        Let's get started.
+        Let's get started
     </h2>
 
     <div class="lets-get-started">
-        <div class="item">
+        <div class="item" data-section="services" onclick="togglePanel('services')">
             <div class="header">
-                <i class="bx bx-dollar-circle" /></i>
+                <i class="bx bx-spa"></i>
                 <h5>Our Services</h5>
+                <i class="bx bx-chevron-down arrow"></i>
             </div>
-            <p>We offer a wide range of nail care services, including manicures, pedicures, nail art, and more. Our team is trained in the latest techniques to ensure your nails look their best.</p>
+            <p>We offer a wide range of nail care services, including manicures, pedicures, nail art, and more.</p>
+        </div>
+        <div class="item" data-section="book" onclick="togglePanel('book')">
+            <div class="header">
+                <i class="bx bx-calendar-check"></i>
+                <h5>Book Now</h5>
+                <i class="bx bx-chevron-down arrow"></i>
+            </div>
+            <p>Ready to treat yourself? Book an appointment with us and let our professionals take care of you.</p>
+        </div>
+        <div class="item" data-section="contact" onclick="togglePanel('contact')">
+            <div class="header">
+                <i class="bx bx-envelope"></i>
+                <h5>Contact Us</h5>
+                <i class="bx bx-chevron-down arrow"></i>
+            </div>
+            <p>Have a question or need help? We'd love to hear from you. Reach out to our friendly team anytime.</p>
         </div>
     </div>
+
+    <div class="info-panels">
+
+        <div class="panel" id="panel-services">
+            <h3>Services & Pricing</h3>
+            <div class="services-grid">
+                <div class="service-item">
+                    <span class="service-name">Classic Manicure</span>
+                    <span class="service-price">$25 – $35</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Gel Manicure</span>
+                    <span class="service-price">$40 – $55</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Classic Pedicure</span>
+                    <span class="service-price">$35 – $45</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Gel Pedicure</span>
+                    <span class="service-price">$50 – $65</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Acrylic Set</span>
+                    <span class="service-price">$55 – $80</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Nail Art</span>
+                    <span class="service-price">from $15</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Nail Extensions</span>
+                    <span class="service-price">$60 – $90</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Nail Removal</span>
+                    <span class="service-price">$15</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Paraffin Treatment</span>
+                    <span class="service-price">$20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-book">
+            <h3>Book an Appointment</h3>
+            <div class="panel-grid">
+                <div class="panel-section">
+                    <h4>Get in Touch</h4>
+                    <div class="detail">
+                        <i class="bx bx-phone"></i>
+                        <span>07962930379</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-envelope"></i>
+                        <span>bookings@soulnailsalon.com.au</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-map-pin"></i>
+                        <span>1 Peter St, Altrincham WA14 2DZ</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-info-circle"></i>
+                        <span>Walk-ins welcome, appointments preferred.</span>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <h4>Opening Hours</h4>
+                    <div class="detail">
+                        <i class="bx bx-time-five"></i>
+                        <span>Monday – Friday &nbsp;&nbsp; 9:00am – 7:00pm</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-time-five"></i>
+                        <span>Saturday &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9:00am – 6:00pm</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-time-five"></i>
+                        <span>Sunday &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10:00am – 5:00pm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-contact">
+            <h3>Contact & Support</h3>
+            <div class="panel-grid">
+                <div class="panel-section">
+                    <h4>Find Us</h4>
+                    <div class="detail">
+                        <i class="bx bx-map-pin"></i>
+                        <span>1 Peter St, Altrincham WA14 2DZ</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-phone"></i>
+                        <span>07962930379</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-envelope"></i>
+                        <span>hello@soulnailsalon.com.au</span>
+                    </div>
+                </div>
+                <div class="panel-section">
+                    <h4>Follow Us</h4>
+                    <div class="detail">
+                        <i class="bx bxl-instagram"></i>
+                        <span>@soulnailsalon</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bxl-facebook"></i>
+                        <span>Soul Nail Salon</span>
+                    </div>
+                    <div class="detail">
+                        <i class="bx bx-support"></i>
+                        <span>Support: support@soulnailsalon.com.au</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="footer-main">
+            <div class="footer-brand">
+                <img src="assets/other/logo_transparent.png" alt="Soul Nail Salon">
+                <p>Caring for your nails with passion and precision. Visit us in the heart of Altrincham for a truly soulful experience.</p>
+                <div class="footer-socials">
+                    <a href="https://www.instagram.com/soul_nails_1109" target="_blank" aria-label="Instagram" class="social-instagram"><i class="bx bxl-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h5>Contact</h5>
+                <ul class="footer-contact">
+                    <li>
+                        <i class="bx bx-map-pin"></i>
+                        <span>1 Peter St, Altrincham WA14 2DZ</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-phone"></i>
+                        <span>07962930379</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-envelope"></i>
+                        <span>hello@soulnailsalon.com.au</span>
+                    </li>
+                    <li>
+                        <i class="bx bx-time-five"></i>
+                        <span>Mon – Fri: 9am – 7pm<br>Sat: 9am – 6pm<br>Sun: 10am – 5pm</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Soul Nail Salon. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function togglePanel(section) {
+            const allItems = document.querySelectorAll('.lets-get-started .item');
+            const allPanels = document.querySelectorAll('.info-panels .panel');
+            const clickedItem = document.querySelector(`.item[data-section="${section}"]`);
+            const targetPanel = document.getElementById(`panel-${section}`);
+            const isAlreadyActive = targetPanel.classList.contains('active');
+
+            allPanels.forEach(p => p.classList.remove('active'));
+            allItems.forEach(i => i.classList.remove('active'));
+
+            if (!isAlreadyActive) {
+                targetPanel.classList.add('active');
+                clickedItem.classList.add('active');
+                targetPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    </script>
+
 </body>
 
 </html>
