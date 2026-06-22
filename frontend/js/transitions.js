@@ -9,4 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => { window.location.href = href; }, 50);
     });
   });
+
+  const navToggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('nav .links');
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      navToggle.querySelector('i').className = isOpen ? 'bx bx-x' : 'bx bx-menu';
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.querySelector('i').className = 'bx bx-menu';
+      });
+    });
+  }
 });
