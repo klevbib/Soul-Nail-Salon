@@ -1,88 +1,103 @@
-# Soul-Nail-Salon
+# Soul Nail Salon
 
-# Soul Nail Salon — Website MVP Plan
+A simple, elegant static website for **Soul Nail Salon**, a boutique nail salon
+in Altrincham. The site presents the salon's services, portfolio, and story, and
+points visitors toward booking by phone or walk-in.
 
-## Goal
-A simple, elegant static website for a new nail salon with two core sections: a portfolio and an about page.
-
----
-
-## Pages / Sections
-
-### 1. Hero (Homepage landing)
-- Salon name and tagline
-- Single CTA button (e.g. "Book Now" or "See Our Work")
-- Full-width background image or soft colour wash
-
-### 2. Portfolio Section
-- Grid of nail art photos (3–4 columns, responsive)
-- Optional category filter (e.g. Gel, Acrylic, Nail Art)
-- Lightbox or hover effect on photos
-- Placeholder images until client supplies real ones
-
-### 3. About Page / Section
-- Short bio of the salon / nail tech(s)
-- Photo of the stylist or salon interior
-- Values or specialty callouts (e.g. "Non-toxic products", "Walk-ins welcome")
-
-### 4. Contact / Footer
-- Phone number, address, social links (Instagram is key for a salon)
-- Booking link (external, e.g. Vagaro, StyleSeat, or Google)
-- Simple hours of operation
+Plain HTML, CSS, and vanilla JavaScript — no build step, no dependencies to
+install, no backend. It can be hosted on any static host (GitHub Pages, Netlify,
+Cloudflare Pages, S3, etc.).
 
 ---
 
-## Tech Stack
+## Running locally
+
+Because everything is static, you can just open `frontend/index.html` in a
+browser. To exercise the page-to-page navigation and relative asset paths
+exactly as they'll behave when hosted, serve the `frontend/` folder instead:
+
+```bash
+cd frontend
+python3 -m http.server 8000
+# then visit http://localhost:8000
+```
+
+Any static file server works equally well (e.g. `npx serve`).
+
+---
+
+## Project structure
+
+```
+Soul-Nail-Salon/
+├── README.md
+├── .gitignore
+└── frontend/                     # Everything the site needs is served from here
+    ├── index.html                # Homepage: hero + "Let's get started" accordion
+    ├── portfolio.html            # Filterable image gallery + lightbox
+    ├── about.html                # Salon story and values
+    ├── privacy-policy.html       # Legal: privacy policy
+    ├── terms-and-conditions.html # Legal: terms & conditions
+    ├── css/
+    │   └── style.css             # Single global stylesheet for all pages
+    ├── js/
+    │   ├── transitions.js        # Loaded everywhere: page fade + mobile nav
+    │   ├── home.js               # index.html "Let's get started" accordion
+    │   └── portfolio.js          # portfolio.html filtering + lightbox
+    └── assets/
+        ├── other/                # Logos, posters
+        └── portfolio/            # Nail art photos shown in the gallery
+```
+
+Each page loads `transitions.js`; the homepage and portfolio additionally load
+their own page-specific script.
+
+---
+
+## How it fits together
+
+- **Shared UI** — the dismissible top banner, navigation bar, and footer are
+  duplicated as plain markup at the top/bottom of every HTML page. There's no
+  templating, so a change to any of them must be applied to each page.
+- **Styling** — one hand-written `css/style.css` covers every page. It opens
+  with a documented colour palette and a numbered table of contents; each major
+  section carries a matching numbered header. Responsive rules for tablet
+  (≤1024px) and mobile (≤768px) live at the bottom.
+- **JavaScript** — small, dependency-free, and split by responsibility:
+  - `transitions.js` — fades between internal pages and drives the mobile
+    hamburger menu.
+  - `home.js` — the homepage accordion (`togglePanel`).
+  - `portfolio.js` — gallery category filtering and the lightbox.
+
+  The page-specific handlers are invoked from inline `onclick`/`onkeydown`
+  attributes in the markup, so those functions are intentionally global.
+- **Icons & fonts** — [Boxicons](https://boxicons.com/) and the Hanken Grotesk
+  Google Font are loaded from CDNs, so an internet connection is needed for them
+  to render.
+
+---
+
+## Tech stack
 
 | Choice     | Reason                                                         |
 | ---------- | -------------------------------------------------------------- |
 | HTML       | Simple, no build step, easy to hand off or host anywhere       |
 | CSS        | Hand-written styles, full control, no dependencies             |
-| JavaScript | Vanilla JS for interactivity (filter, lightbox, smooth scroll) |
-| No backend | Static site, all data hardcoded for MVP                        |
+| JavaScript | Vanilla JS for interactivity (filter, lightbox, transitions)   |
+| No backend | Fully static; all content is hardcoded in the HTML             |
 
-> **Future path:** Migrate to a framework (React, Next.js) if the site grows in complexity or SEO becomes a priority.
-
----
-
-## File Structure
-
-```
-/
-├── index.html              # Homepage (Hero + Portfolio)
-├── about.html              # About page
-├── css/
-│   ├── style.css           # Global styles and layout
-│   └── portfolio.css       # Portfolio grid and lightbox styles
-├── js/
-│   ├── main.js             # Shared behaviour (navbar, smooth scroll)
-│   └── portfolio.js        # Filter and lightbox logic
-└── assets/
-    ├── portfolio/           # Nail art photos
-    └── about/               # Salon / stylist photos
-```
+> **Future path:** migrate to a framework (React, Next.js, Astro) if the site
+> grows or the shared banner/nav/footer duplication becomes hard to maintain.
 
 ---
 
-## MVP Scope (what's in, what's out)
+## Editing content
 
-**In**
-- Responsive layout (mobile + desktop)
-- Portfolio grid with placeholder images
-- About section with bio placeholder text
-- Footer with contact info placeholders
-
-**Out (post-MVP)**
-- Online booking integration
-- Blog or news section
-- Loyalty program / promotions page
-- CMS (e.g. Contentful, Sanity) for client to self-edit
-
----
-
-## Open Questions for Client
-1. Preferred color palette / brand colors?
-2. Do they have a logo?
-3. Real portfolio photos available, or need stock imagery for now?
-4. Which booking platform do they use (or plan to use)?
-5. Any existing social media handles to link?
+- **Services & pricing** — the services list on `index.html` (`#panel-services`).
+- **Contact details, address, hours** — appear in the nav/panels/footer of every
+  page; update them everywhere they occur.
+- **Portfolio images** — add a `.png` to `frontend/assets/portfolio/`, then add a
+  matching `.gallery-item` in `portfolio.html`. Set `data-category` to one of
+  `manicure`, `nail-art`, `gel`, or `acrylic` so the filter buttons include it.
+- **Booking** — currently phone/walk-in only; there is no online booking
+  integration yet.

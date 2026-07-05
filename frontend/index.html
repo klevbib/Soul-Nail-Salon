@@ -8,15 +8,21 @@
     <link rel="stylesheet" href="css/style.css">
     <title>Soul Nail Salon</title>
     <script src="js/transitions.js" defer></script>
+    <script src="js/home.js" defer></script>
 </head>
 
 <body>
 
+    <!-- Homepage: hero, "Let's get started" accordion (services / booking /
+         contact), and the shared banner, nav, and footer used on every page. -->
+
+    <!-- Dismissible promo banner -->
     <div class="top-banner">
         <p>Now booking appointments — <a href="tel:07962930379">call 07962930379</a> or walk in today</p>
         <button class="banner-close" onclick="this.parentElement.style.display='none'">&times;</button>
     </div>
 
+    <!-- Primary navigation (hamburger menu on mobile) -->
     <nav>
         <a href="#" class="logo"> <img src="assets/other/logo_transparent.png" alt="Nail Salon"> </a>
         <div class="links">
@@ -27,12 +33,13 @@
         <button class="nav-toggle" aria-label="Toggle menu"><i class="bx bx-menu"></i></button>
     </nav>
 
+    <!-- Hero -->
     <header>
         <div class="left">
             <h1>Welcome to <span>Soul Nail Salon</span></h1>
             <p>We provide the best nail care services in town. Our team of skilled professionals is dedicated to making your nails look fabulous.</p>
             <a href="portfolio.html">
-                <i class="bx bx-book" /></i>
+                <i class="bx bx-book"></i>
                 <span>See our Portfolio</span>
             </a>
         </div>
@@ -45,6 +52,7 @@
         Let's get started
     </h2>
 
+    <!-- "Let's get started" cards — each toggles the matching panel below -->
     <div class="lets-get-started">
         <div class="item" data-section="services" onclick="togglePanel('services')">
             <div class="header">
@@ -72,6 +80,7 @@
         </div>
     </div>
 
+    <!-- Expandable panels revealed by the cards above (see js/home.js) -->
     <div class="info-panels">
 
         <div class="panel" id="panel-services">
@@ -182,6 +191,7 @@
 
     </div>
 
+    <!-- Shared site footer -->
     <footer>
         <div class="footer-main">
             <div class="footer-brand">
@@ -224,25 +234,6 @@
             <p>&copy; 2026 Soul Nail Salon. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        function togglePanel(section) {
-            const allItems = document.querySelectorAll('.lets-get-started .item');
-            const allPanels = document.querySelectorAll('.info-panels .panel');
-            const clickedItem = document.querySelector(`.item[data-section="${section}"]`);
-            const targetPanel = document.getElementById(`panel-${section}`);
-            const isAlreadyActive = targetPanel.classList.contains('active');
-
-            allPanels.forEach(p => p.classList.remove('active'));
-            allItems.forEach(i => i.classList.remove('active'));
-
-            if (!isAlreadyActive) {
-                targetPanel.classList.add('active');
-                clickedItem.classList.add('active');
-                targetPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }
-    </script>
 
 </body>
 
