@@ -1,0 +1,98 @@
+// Prisma schema for the Soul Nail Salon booking backend.
+//
+// Local dev uses SQLite (see DATABASE_URL in .env). For production, switch the
+// datasource provider to "postgresql" and point DATABASE_URL at Postgres — the
+// models below are portable. Two SQLite-driven choices to note:
+//   * `status` is a String (SQLite has no native enums). Allowed values are
+//     documented on the field; validation happens in application code.
+//   * Money is stored as integer **pence** (SQLite lacks a Decimal type), which
+//     also sidesteps floating-point rounding for currency.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id              String         @id @default(cuid())
+  name            String         @unique
+  priceMinPence   Int
+  priceMaxPence   Int
+  durationMinutes Int
+  depositPence    Int            @default(1000)
+  active          Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+
+  staff           StaffService[]
+  bookings        Booking[]
+}
+
+model Staff {
+  id        String         @id @default(cuid())
+  name      String
+  active    Boolean        @default(true)
+  createdAt DateTime       @default(now())
+
+  services  StaffService[]
+  timeOff   TimeOff[]
+  bookings  Booking[]
+}
+
+// Which technicians can perform which services (many-to-many).
+model StaffService {
+  staffId   String
+  serviceId String
+
+  staff     Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([staffId, serviceId])
+}
+
+// Opening hours per weekday. `weekday` follows JS Date.getDay(): 0=Sunday .. 6=Saturday.
+// A closed day has null open/close. Times are minutes from midnight (e.g. 570 = 09:30).
+model BusinessHours {
+  id       Int  @id @default(autoincrement())
+  weekday  Int  @unique
+  openMin  Int?
+  closeMin Int?
+}
+
+// Per-staff blocks that make slots unavailable (holiday, breaks, sickness).
+model TimeOff {
+  id        String   @id @default(cuid())
+  staffId   String
+  startTime DateTime
+  endTime   DateTime
+  reason    String?
+
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@index([staffId, startTime])
+}
+
+model Booking {
+  id                    String   @id @default(cuid())
+  serviceId             String
+  staffId               String
+  customerName          String
+  customerEmail         String
+  customerPhone         String
+  startTime             DateTime
+  endTime               DateTime
+  // One of: pending | confirmed | cancelled | completed
+  status                String   @default("confirmed")
+  depositPaid           Boolean  @default(false)
+  stripePaymentIntentId String?
+  createdAt             DateTime @default(now())
+
+  service               Service  @relation(fields: [serviceId], references: [id])
+  staff                 Staff    @relation(fields: [staffId], references: [id])
+
+  @@index([staffId, startTime])
+  @@index([status])
+}

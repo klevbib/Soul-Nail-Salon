@@ -1,0 +1,43 @@
+import express from 'express';
+import cors from 'cors';
+import { config } from './lib/config';
+import { servicesRouter } from './routes/services';
+import { staffRouter } from './routes/staff';
+import { availabilityRouter } from './routes/availability';
+
+export function createApp() {
+  const app = express();
+
+  app.use(
+    cors({
+      origin: config.corsOrigins.length > 0 ? config.corsOrigins : true,
+    }),
+  );
+  app.use(express.json());
+
+  app.get('/api/health', (_req, res) => {
+    res.json({ ok: true });
+  });
+
+  app.use('/api/services', servicesRouter);
+  app.use('/api/staff', staffRouter);
+  app.use('/api/availability', availabilityRouter);
+
+  // Centralised error handler.
+  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  });
+
+  return app;
+}
+
+// Only start listening when run directly (not when imported by tests).
+if (require.main === module) {
+  const app = createApp();
+  app.listen(config.port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Soul Nail Salon API listening on http://localhost:${config.port}`);
+  });
+}
