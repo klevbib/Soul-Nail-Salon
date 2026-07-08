@@ -1,4 +1,40 @@
+/* ============================================================================
+   Soul Nail Salon — global stylesheet
+   Shared by every page. Plain hand-written CSS, no build step.
+
+   Colour palette
+   --------------------------------------------------------------------------
+   #F6F3EC  Cream        page background / light text on dark
+   #C25B3D  Terracotta   primary accent (buttons, links, banner)
+   #B05235  Terracotta   hover state
+   #A84D32  Terracotta   active/pressed state
+   #1B1815  Near-black   headings, dark sections (footer, legal hero)
+   #D9D1C3  Sand         borders / dividers
+   #A89F96  Warm grey    muted text on dark backgrounds
+   #3A3530  Warm brown   body copy on legal pages
+   #5C554F  Warm grey    subtle text (footer copyright)
+
+   Type:  Hanken Grotesk (Google Fonts), sans-serif fallback.
+   Layout: 80px side gutters on desktop, tightened to 20px under 768px.
+
+   Contents
+   --------------------------------------------------------------------------
+     1. Page transitions & base reset
+     2. Top banner
+     3. Navigation & logo
+     4. Hero (header)
+     5. "Let's get started" cards + info panels
+     6. Services grid / panel grid
+     7. Portfolio (filters, gallery, lightbox)
+     8. Legal & about pages (.legal-content)
+     9. Footer
+    10. Nav toggle (hamburger)
+    11. Responsive — tablet (≤1024px) & mobile (≤768px)
+   ============================================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* ===================== 1. PAGE TRANSITIONS & BASE RESET ===================== */
 
 @keyframes pageSlideIn {
   from { opacity: 0; transform: translateX(24px); }
@@ -22,6 +58,8 @@ body.fade-out {
   font-family: 'Hanken Grotesk', sans-serif;
   color: #1B1815;
 }
+
+/* ===================== 2. TOP BANNER ===================== */
 
 .top-banner{
     background-color: #C25B3D;
@@ -64,6 +102,8 @@ body.fade-out {
     opacity: 1;
 }
 
+/* ===================== 3. NAVIGATION & LOGO ===================== */
+
 .logo img{
     margin-top: 10px;
     width: 300px;
@@ -99,6 +139,8 @@ nav .links{
     align-items: center;
     gap: 30px;
 }
+
+/* ===================== 4. HERO (HEADER) ===================== */
 
 header{
     padding: 0px 80px;
@@ -169,6 +211,8 @@ h2.separator{
     font-size: 40px;
     margin: 50px 0px;
 }
+
+/* ===================== 5. "LET'S GET STARTED" CARDS + INFO PANELS ===================== */
 
 .lets-get-started{
     padding: 0px 80px;
@@ -260,7 +304,7 @@ h2.separator{
     color: #1B1815;
 }
 
-/* Services grid */
+/* ===================== 6. SERVICES GRID / PANEL GRID ===================== */
 
 .services-grid{
     display: grid;
@@ -329,7 +373,7 @@ h2.separator{
     flex-shrink: 0;
 }
 
-/* Portfolio page */
+/* ===================== 7. PORTFOLIO (FILTERS, GALLERY, LIGHTBOX) ===================== */
 
 .portfolio-header{
     padding: 40px 80px 0;
@@ -469,7 +513,7 @@ h2.separator{
     opacity: 1;
 }
 
-/* Legal pages (privacy policy, terms & conditions) */
+/* ===================== 8. LEGAL & ABOUT PAGES ===================== */
 
 .legal-hero{
     background-color: #1B1815;
@@ -548,7 +592,7 @@ h2.separator{
     margin: 32px 0;
 }
 
-/* Footer */
+/* ===================== 9. FOOTER ===================== */
 
 footer{
     background-color: #1B1815;
@@ -690,7 +734,7 @@ footer{
     color: #A89F96;
 }
 
-/* ===================== NAV TOGGLE (desktop: hidden) ===================== */
+/* ===================== 10. NAV TOGGLE (hamburger — hidden on desktop) ===================== */
 
 .nav-toggle{
     display: none;
@@ -708,7 +752,7 @@ footer{
     color: #1B1815;
 }
 
-/* ===================== RESPONSIVE — TABLET (≤1024px) ===================== */
+/* ===================== 11. RESPONSIVE — TABLET (≤1024px) ===================== */
 
 @media (max-width: 1024px){
     header .left h1{ font-size: 48px; }
@@ -722,7 +766,7 @@ footer{
     }
 }
 
-/* ===================== RESPONSIVE — MOBILE (≤768px) ===================== */
+/* ===================== 11. RESPONSIVE — MOBILE (≤768px) ===================== */
 
 @media (max-width: 768px){
 

@@ -8,9 +8,13 @@
     <link rel="stylesheet" href="css/style.css">
     <title>Portfolio — Soul Nail Salon</title>
     <script src="js/transitions.js" defer></script>
+    <script src="js/portfolio.js" defer></script>
 </head>
 
 <body>
+
+    <!-- Portfolio page: filterable image gallery with a full-screen lightbox.
+         Interactivity lives in js/portfolio.js. -->
 
     <div class="top-banner">
         <p>Now booking appointments — <a href="tel:07962930379">call 07962930379</a> or walk in today</p>
@@ -27,17 +31,20 @@
         <button class="nav-toggle" aria-label="Toggle menu"><i class="bx bx-menu"></i></button>
     </nav>
 
+    <!-- Category filter buttons — each calls filterGallery() in js/portfolio.js.
+         `data-filter` must match the `data-category` on the gallery items below. -->
     <div class="portfolio-header">
         <h1>Our Portfolio</h1>
         <div class="portfolio-filters">
             <button class="filter-btn active" data-filter="all" onclick="filterGallery('all')">All</button>
             <button class="filter-btn" data-filter="manicure" onclick="filterGallery('manicure')">Manicure</button>
-<button class="filter-btn" data-filter="nail-art" onclick="filterGallery('nail-art')">Nail Art</button>
+            <button class="filter-btn" data-filter="nail-art" onclick="filterGallery('nail-art')">Nail Art</button>
             <button class="filter-btn" data-filter="gel" onclick="filterGallery('gel')">Gel</button>
             <button class="filter-btn" data-filter="acrylic" onclick="filterGallery('acrylic')">Acrylic</button>
         </div>
     </div>
 
+    <!-- Gallery — click any item to open it in the lightbox -->
     <div class="gallery-grid">
 
         <div class="gallery-item" data-category="nail-art" onclick="openLightbox('assets/portfolio/nail-art-1.png')">
@@ -154,37 +161,6 @@
             <p>&copy; 2026 Soul Nail Salon. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        function filterGallery(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.filter === category);
-            });
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                const show = category === 'all' || item.dataset.category === category;
-                item.style.display = show ? 'block' : 'none';
-            });
-        }
-
-        function openLightbox(src) {
-            document.getElementById('lightbox-img').src = src;
-            document.getElementById('lightbox').classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('open');
-            document.body.style.overflow = '';
-        }
-
-        function handleLightboxClick(e) {
-            if (e.target === document.getElementById('lightbox')) closeLightbox();
-        }
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeLightbox();
-        });
-    </script>
 
 </body>
 
