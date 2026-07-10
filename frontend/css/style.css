@@ -167,6 +167,13 @@ header .left p{
     width: 500px;
 }
 
+.hero-cta{
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
 header .left a{
     display: flex;
     align-items: center;
@@ -178,6 +185,17 @@ header .left a{
     padding: 8px;
     border-radius: 60px;
     transition: all 0.3s ease;
+}
+
+/* Secondary hero button (Portfolio) reads as an outline next to the primary
+   "Book online" call-to-action. */
+.hero-cta a:not(.hero-cta-primary){
+    background-color: transparent;
+    border: 2px solid #C25B3D;
+}
+
+.hero-cta a:not(.hero-cta-primary):hover{
+    background-color: #F6F3EC;
 }
 
 header .left a:hover{
@@ -869,5 +887,340 @@ footer{
         flex-direction: column;
         gap: 8px;
         text-align: center;
+    }
+}
+
+/* ===================== 12. BOOKING WIDGET (#panel-book) ===================== */
+
+/* The multi-step widget is taller than a normal info panel, so give the book
+   panel room to expand past the default 700px max-height. */
+.info-panels #panel-book.active{
+    max-height: 3000px;
+}
+
+.booking-widget{
+    margin-bottom: 32px;
+}
+
+/* Step progress indicator */
+.booking-steps{
+    display: flex;
+    gap: 8px;
+    list-style: none;
+    counter-reset: step;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.booking-steps li{
+    counter-increment: step;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #A89F96;
+    flex: 1;
+    min-width: 120px;
+}
+
+.booking-steps li::before{
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #F6F3EC;
+    border: 1.5px solid #D9D1C3;
+    font-size: 13px;
+    font-weight: 600;
+    color: #A89F96;
+    flex-shrink: 0;
+}
+
+.booking-steps li.active{
+    color: #1B1815;
+}
+
+.booking-steps li.active::before{
+    background: #C25B3D;
+    border-color: #C25B3D;
+    color: #fff;
+}
+
+.booking-steps li.done{
+    color: #1B1815;
+}
+
+.booking-steps li.done::before{
+    content: '\2713'; /* check mark */
+    background: #A84D32;
+    border-color: #A84D32;
+    color: #fff;
+}
+
+.booking-body{
+    min-height: 180px;
+}
+
+.booking-prompt{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1B1815;
+}
+
+.booking-hint{
+    font-size: 14px;
+    color: #5C554F;
+    margin: 4px 0 12px;
+}
+
+.booking-fineprint{
+    margin-top: 14px;
+}
+
+/* Option cards (service / technician) */
+.booking-options{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.booking-option{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    text-align: left;
+    padding: 14px 18px;
+    border: 1.5px solid #D9D1C3;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Hanken Grotesk', sans-serif;
+}
+
+.booking-option:hover{
+    border-color: #C25B3D;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.booking-option .bo-name{
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.booking-option .bo-meta{
+    font-size: 13px;
+    color: #C25B3D;
+    font-weight: 500;
+}
+
+/* Date + time selection */
+.booking-date{
+    width: 100%;
+    max-width: 260px;
+    padding: 10px 14px;
+    border: 1.5px solid #D9D1C3;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Hanken Grotesk', sans-serif;
+    background: #fff;
+    margin-bottom: 8px;
+}
+
+.booking-date:focus{
+    outline: none;
+    border-color: #C25B3D;
+}
+
+.booking-times{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.booking-time{
+    padding: 8px 16px;
+    border-radius: 60px;
+    border: 1.5px solid #D9D1C3;
+    background: #fff;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.booking-time:hover{
+    border-color: #C25B3D;
+    color: #C25B3D;
+}
+
+/* Summary + form (details step) */
+.booking-summary{
+    background: #F6F3EC;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+}
+
+.booking-summary-row{
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 5px 0;
+    font-size: 15px;
+}
+
+.booking-summary-row span{
+    color: #5C554F;
+}
+
+.booking-form{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.booking-field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.booking-field span{
+    font-size: 14px;
+    font-weight: 600;
+    color: #1B1815;
+}
+
+.booking-field input{
+    padding: 10px 14px;
+    border: 1.5px solid #D9D1C3;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Hanken Grotesk', sans-serif;
+    background: #fff;
+}
+
+.booking-field input:focus{
+    outline: none;
+    border-color: #C25B3D;
+}
+
+.booking-submit{
+    margin-top: 6px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 60px;
+    background: #C25B3D;
+    color: #fff;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.booking-submit:hover{
+    background: #B05235;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.booking-submit:disabled{
+    background: #A89F96;
+    cursor: default;
+    box-shadow: none;
+}
+
+.booking-back{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: none;
+    color: #C25B3D;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+}
+
+.booking-back:hover{
+    color: #A84D32;
+}
+
+/* Status messages (loading / no slots / errors / success) */
+.booking-message{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 28px 16px;
+    color: #5C554F;
+}
+
+.booking-message i{
+    font-size: 40px;
+    color: #C25B3D;
+}
+
+.booking-message a{
+    color: #C25B3D;
+    font-weight: 600;
+}
+
+.booking-success i{
+    font-size: 54px;
+}
+
+.booking-success h4{
+    font-size: 22px;
+    font-weight: 700;
+    color: #1B1815;
+}
+
+.booking-success .booking-summary{
+    text-align: left;
+    width: 100%;
+    max-width: 360px;
+}
+
+.booking-error{
+    background: #FBEAE6;
+    border: 1.5px solid #E0A99B;
+    color: #A84D32;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+
+/* Divider above the reference contact/hours block */
+.booking-contact{
+    border-top: 1.5px solid #D9D1C3;
+    padding-top: 24px;
+}
+
+@media (max-width: 768px){
+    .booking-options{
+        grid-template-columns: 1fr;
+    }
+    .booking-steps li{
+        min-width: 0;
+        font-size: 0; /* hide labels, keep the numbered circles */
+        gap: 0;
+        flex: 0 0 auto;
+    }
+    .booking-steps li::before{
+        font-size: 13px;
     }
 }

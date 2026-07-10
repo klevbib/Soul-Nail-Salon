@@ -9,6 +9,7 @@
     <title>Soul Nail Salon</title>
     <script src="js/transitions.js" defer></script>
     <script src="js/home.js" defer></script>
+    <script src="js/booking.js" defer></script>
 </head>
 
 <body>
@@ -18,7 +19,7 @@
 
     <!-- Dismissible promo banner -->
     <div class="top-banner">
-        <p>Now booking appointments — <a href="tel:07962930379">call 07962930379</a> or walk in today</p>
+        <p>Now booking appointments — <a href="#panel-book" onclick="togglePanel('book')">book online</a> or <a href="tel:07962930379">call 07962930379</a></p>
         <button class="banner-close" onclick="this.parentElement.style.display='none'">&times;</button>
     </div>
 
@@ -38,10 +39,16 @@
         <div class="left">
             <h1>Welcome to <span>Soul Nail Salon</span></h1>
             <p>We provide the best nail care services in town. Our team of skilled professionals is dedicated to making your nails look fabulous.</p>
-            <a href="portfolio.html">
-                <i class="bx bx-book"></i>
-                <span>See our Portfolio</span>
-            </a>
+            <div class="hero-cta">
+                <a href="#panel-book" class="hero-cta-primary" onclick="togglePanel('book')">
+                    <i class="bx bx-calendar-check"></i>
+                    <span>Book online</span>
+                </a>
+                <a href="portfolio.html">
+                    <i class="bx bx-book"></i>
+                    <span>See our Portfolio</span>
+                </a>
+            </div>
         </div>
         <img src="assets/other/logo_transparent.png" alt="Nail Salon">
     </header>
@@ -127,7 +134,27 @@
 
         <div class="panel" id="panel-book">
             <h3>Book an Appointment</h3>
-            <div class="panel-grid">
+
+            <!-- Multi-step booking widget — powered by js/booking.js against the
+                 booking API. Steps and body are rendered/updated by the script. -->
+            <div class="booking-widget" id="booking-widget">
+                <ol class="booking-steps" id="booking-steps">
+                    <li data-step="1" class="active">Service</li>
+                    <li data-step="2">Technician</li>
+                    <li data-step="3">Date &amp; Time</li>
+                    <li data-step="4">Your Details</li>
+                </ol>
+                <div class="booking-body" id="booking-body">
+                    <!-- Fallback shown before JS runs / if it fails to load -->
+                    <div class="booking-message">
+                        <i class="bx bx-loader-alt bx-spin"></i>
+                        <p>Loading the booking form… if it doesn't appear, call us on
+                            <a href="tel:07962930379">07962930379</a>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-grid booking-contact">
                 <div class="panel-section">
                     <h4>Get in Touch</h4>
                     <div class="detail">

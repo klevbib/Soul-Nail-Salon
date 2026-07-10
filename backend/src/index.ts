@@ -4,6 +4,7 @@ import { config } from './lib/config';
 import { servicesRouter } from './routes/services';
 import { staffRouter } from './routes/staff';
 import { availabilityRouter } from './routes/availability';
+import { bookingsRouter } from './routes/bookings';
 
 export function createApp() {
   const app = express();
@@ -22,6 +23,7 @@ export function createApp() {
   app.use('/api/services', servicesRouter);
   app.use('/api/staff', staffRouter);
   app.use('/api/availability', availabilityRouter);
+  app.use('/api/bookings', bookingsRouter);
 
   // Centralised error handler.
   app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
