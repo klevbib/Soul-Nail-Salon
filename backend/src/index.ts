@@ -5,6 +5,7 @@ import { servicesRouter } from './routes/services';
 import { staffRouter } from './routes/staff';
 import { availabilityRouter } from './routes/availability';
 import { bookingsRouter } from './routes/bookings';
+import { stripeRouter } from './routes/stripe';
 
 export function createApp() {
   const app = express();
@@ -14,6 +15,13 @@ export function createApp() {
       origin: config.corsOrigins.length > 0 ? config.corsOrigins : true,
     }),
   );
+
+  // Stripe's webhook must read the raw request body to verify signatures, so it
+  // is mounted BEFORE express.json() (which would consume the body first). The
+  // route applies its own express.raw() parser. /api/stripe/config is a plain
+  // GET with no body, so it's unaffected.
+  app.use('/api/stripe', stripeRouter);
+
   app.use(express.json());
 
   app.get('/api/health', (_req, res) => {

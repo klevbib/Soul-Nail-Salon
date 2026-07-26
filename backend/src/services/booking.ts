@@ -17,6 +17,7 @@
 import { prisma } from '../lib/prisma';
 import { config } from '../lib/config';
 import { overlaps } from './availability';
+import { createDepositIntent } from './payments';
 
 export class BookingError extends Error {
   constructor(public status: number, message: string) {
@@ -90,6 +91,12 @@ export interface CreatedBooking {
   status: string;
   depositPence: number;
   depositPaid: boolean;
+  /**
+   * Present only when a deposit is required (payments enabled). The frontend
+   * passes this to Stripe.js to collect the card and confirm payment; the
+   * booking stays 'pending' until Stripe's webhook confirms it.
+   */
+  clientSecret?: string;
 }
 
 /**
@@ -150,8 +157,7 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
   // two concurrent requests can't both claim the same technician + time.
   // (SQLite is single-writer, so this serialises; on Postgres, Serializable
   // gives the same guarantee. There is no exclusion constraint to lean on.)
-  try {
-    return await prisma.$transaction(
+  const created: CreatedBooking = await prisma.$transaction(
       async (tx) => {
         for (const staffId of candidateIds) {
           const [conflictingBooking, conflictingTimeOff] = await Promise.all([
@@ -184,9 +190,11 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
               customerPhone: input.customerPhone,
               startTime: start,
               endTime: end,
-              // Deposits arrive in Phase 3; until then a booking is confirmed
-              // on creation. When deposits are enabled this becomes 'pending'.
-              status: 'confirmed',
+              // With deposits on, the slot is held as 'pending' until Stripe's
+              // webhook confirms payment; otherwise (free-first) it's confirmed
+              // straight away. A 'pending' booking still blocks the slot from
+              // other customers (see the overlap check above).
+              status: config.paymentsEnabled ? 'pending' : 'confirmed',
             },
           });
 
@@ -209,12 +217,34 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       },
       { isolationLevel: 'Serializable' },
     );
-  } catch (err) {
-    // Double-check the overlap guard survived a lost race (belt and braces):
-    // an insert that violated our intent still surfaces as a BookingError.
-    if (err instanceof BookingError) throw err;
-    throw err;
+
+  // Deposit step. Done AFTER the transaction commits so a Stripe network call
+  // never runs while holding SQLite's write lock. If Stripe fails we roll the
+  // booking back (releasing the slot) rather than leave a pending booking that
+  // can never be paid.
+  if (config.paymentsEnabled) {
+    try {
+      const intent = await createDepositIntent({
+        bookingId: created.id,
+        amountPence: created.depositPence,
+        customerEmail: input.customerEmail,
+        serviceName: created.serviceName,
+      });
+      await prisma.booking.update({
+        where: { id: created.id },
+        data: { stripePaymentIntentId: intent.paymentIntentId },
+      });
+      created.clientSecret = intent.clientSecret;
+    } catch (err) {
+      await prisma.booking.delete({ where: { id: created.id } }).catch(() => {
+        /* best-effort rollback; ignore if already gone */
+      });
+      if (err instanceof BookingError) throw err;
+      throw new BookingError(502, 'Could not start payment — please try again');
+    }
   }
+
+  return created;
 }
 
 /**

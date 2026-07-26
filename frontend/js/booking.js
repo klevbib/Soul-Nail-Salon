@@ -42,6 +42,9 @@
     slots: [], // [{ label, iso }]
     slotIso: null,
     slotLabel: null,
+    // Deposit payments (Phase 3). Populated from GET /api/stripe/config; stays
+    // disabled (free-first) if the endpoint is absent or payments are off.
+    stripe: { enabled: false, publishableKey: '' },
   };
 
   let bodyEl;
@@ -51,6 +54,7 @@
     bodyEl = document.getElementById('booking-body');
     stepsEl = document.getElementById('booking-steps');
     if (!bodyEl) return; // widget not on this page
+    loadPaymentConfig(); // fire-and-forget; ready before the user reaches step 4
     loadServices();
   });
 
@@ -142,6 +146,40 @@
     }
   }
 
+  async function loadPaymentConfig() {
+    try {
+      const res = await fetch(API_BASE + '/stripe/config');
+      if (!res.ok) return; // older backend without payments — stay disabled
+      const data = await res.json();
+      state.stripe.enabled = !!data.paymentsEnabled;
+      state.stripe.publishableKey = data.publishableKey || '';
+    } catch (err) {
+      /* network/endpoint missing — deposits simply stay off */
+    }
+  }
+
+  // Load Stripe.js once, lazily, only if a deposit is actually required.
+  let stripeJsPromise = null;
+  function loadStripeJs() {
+    if (window.Stripe) return Promise.resolve();
+    if (stripeJsPromise) return stripeJsPromise;
+    stripeJsPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://js.stripe.com/v3/';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return stripeJsPromise;
+  }
+
+  let stripeInstance = null;
+  async function ensureStripe() {
+    await loadStripeJs();
+    if (!stripeInstance) stripeInstance = window.Stripe(state.stripe.publishableKey);
+    return stripeInstance;
+  }
+
   async function loadStaff() {
     render(messageHtml('bx-loader-alt bx-spin', 'Loading technicians…'));
     try {
@@ -215,6 +253,12 @@
         return;
       }
       state.confirmed = data.booking;
+      // Deposit flow: the API returns a Stripe client secret and holds the
+      // booking as 'pending'. Collect the card before showing confirmation.
+      if (data.booking && data.booking.clientSecret) {
+        renderPayment(data.booking);
+        return;
+      }
       goTo(5);
     } catch (err) {
       showFormError('Could not reach the booking service. Please try again or call us.');
@@ -416,7 +460,11 @@
       field('phone', 'Phone', 'tel', '07…') +
       '<button type="submit" class="booking-submit">Confirm booking</button>' +
       '</form>' +
-      '<p class="booking-hint booking-fineprint">No payment is taken now — we\'ll confirm your appointment by email.</p>';
+      '<p class="booking-hint booking-fineprint">' +
+      (state.stripe.enabled
+        ? 'A small deposit is taken next to secure your booking — the balance is paid in-salon.'
+        : 'No payment is taken now — we\'ll confirm your appointment by email.') +
+      '</p>';
     wireBack();
     const retime = document.getElementById('booking-retime-link');
     if (retime)
@@ -442,6 +490,54 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Please enter a valid email address.';
     if (form.phone.value.trim().length < 5) return 'Please enter a contact phone number.';
     return null;
+  }
+
+  // Deposit step (only reached when payments are enabled and the API returned a
+  // client secret). Mounts Stripe's Payment Element, then confirms the payment.
+  // The booking is already saved server-side as 'pending'; Stripe's webhook
+  // flips it to 'confirmed' once this payment succeeds.
+  async function renderPayment(booking) {
+    state.step = 5; // hides the step list; confirmation reuses step 5 afterwards
+    setSteps();
+    const deposit = money(booking.depositPence);
+    bodyEl.innerHTML =
+      '<p class="booking-prompt">Secure your booking with a ' + deposit + ' deposit.</p>' +
+      '<div class="booking-summary">' +
+      summaryRow('Service', booking.serviceName) +
+      summaryRow('When', prettyDate(state.date) + ', ' + prettyTime(state.slotLabel)) +
+      summaryRow('Deposit', deposit) +
+      '</div>' +
+      '<div id="booking-form-error" class="booking-error" style="display:none"></div>' +
+      '<div id="payment-element" class="booking-payment"></div>' +
+      '<button type="button" class="booking-submit" id="booking-pay">Pay ' + deposit + ' deposit</button>' +
+      '<p class="booking-hint booking-fineprint">The balance is paid in-salon. ' +
+      'Card details are handled securely by Stripe.</p>';
+
+    let stripe;
+    let elements;
+    try {
+      stripe = await ensureStripe();
+      elements = stripe.elements({ clientSecret: booking.clientSecret });
+      elements.create('payment').mount('#payment-element');
+    } catch (err) {
+      showFormError('Could not load the payment form. Please try again or call us on ' + SALON_PHONE + '.');
+      return;
+    }
+
+    const payBtn = document.getElementById('booking-pay');
+    payBtn.addEventListener('click', async () => {
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing…';
+      const { error } = await stripe.confirmPayment({ elements, redirect: 'if_required' });
+      if (error) {
+        showFormError(error.message || 'Payment could not be completed. Please try another card.');
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay ' + deposit + ' deposit';
+        return;
+      }
+      // Paid. The webhook confirms the booking server-side; show confirmation.
+      goTo(5);
+    });
   }
 
   function renderConfirmation() {
