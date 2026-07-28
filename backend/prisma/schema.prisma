@@ -88,6 +88,9 @@ model Booking {
   status                String   @default("confirmed")
   depositPaid           Boolean  @default(false)
   stripePaymentIntentId String?
+  // When the pre-appointment reminder was sent; null = not yet reminded. The
+  // reminder sweep sets this so a booking is reminded at most once.
+  reminderSentAt        DateTime?
   createdAt             DateTime @default(now())
 
   service               Service  @relation(fields: [serviceId], references: [id])

@@ -3,6 +3,7 @@ import { getStripe } from '../lib/stripe';
 import { config } from '../lib/config';
 import { prisma } from '../lib/prisma';
 import { bookingUpdateForEvent } from '../services/payments';
+import { sendBookingConfirmation } from '../services/notifications';
 
 export const stripeRouter = Router();
 
@@ -47,13 +48,34 @@ stripeRouter.post('/webhook', raw({ type: 'application/json' }), async (req, res
     // updateMany (not update) so an event for an unknown/already-handled booking
     // is a harmless no-op rather than a throw. Only move bookings still awaiting
     // payment, so a late event can't resurrect a cancelled/completed booking.
-    await prisma.booking.updateMany({
+    const { count } = await prisma.booking.updateMany({
       where: {
         status: 'pending',
         ...(bookingId ? { id: bookingId } : { stripePaymentIntentId: intent.id }),
       },
       data: update,
     });
+
+    // A payment that just moved a pending booking to 'confirmed' is the point at
+    // which we notify the customer (the create step stayed silent because the
+    // slot was only held). count > 0 means this event actually confirmed a
+    // booking, so a duplicate/late event won't re-notify.
+    if (count > 0 && update.status === 'confirmed') {
+      const id =
+        bookingId ??
+        (
+          await prisma.booking.findFirst({
+            where: { stripePaymentIntentId: intent.id },
+            select: { id: true },
+          })
+        )?.id;
+      if (id) {
+        void sendBookingConfirmation(id).catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error('Confirmation notification failed:', err);
+        });
+      }
+    }
   }
 
   // Always 200 a verified event so Stripe stops retrying.

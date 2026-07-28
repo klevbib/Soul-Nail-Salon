@@ -18,6 +18,7 @@ import { prisma } from '../lib/prisma';
 import { config } from '../lib/config';
 import { overlaps } from './availability';
 import { createDepositIntent } from './payments';
+import { sendBookingConfirmation } from './notifications';
 
 export class BookingError extends Error {
   constructor(public status: number, message: string) {
@@ -242,6 +243,16 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       if (err instanceof BookingError) throw err;
       throw new BookingError(502, 'Could not start payment — please try again');
     }
+  } else {
+    // Payments off: the booking is confirmed on creation, so send the
+    // confirmation now. With deposits on, the booking is still 'pending' here —
+    // its confirmation is sent from the Stripe webhook once payment succeeds.
+    // Fire-and-forget: a slow or failing provider must never delay or fail the
+    // booking response (notifications are best-effort and never throw).
+    void sendBookingConfirmation(created.id).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error('Confirmation notification failed:', err);
+    });
   }
 
   return created;

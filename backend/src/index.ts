@@ -6,6 +6,7 @@ import { staffRouter } from './routes/staff';
 import { availabilityRouter } from './routes/availability';
 import { bookingsRouter } from './routes/bookings';
 import { stripeRouter } from './routes/stripe';
+import { startReminderSweeps } from './jobs/reminders';
 
 export function createApp() {
   const app = express();
@@ -50,4 +51,7 @@ if (require.main === module) {
     // eslint-disable-next-line no-console
     console.log(`Soul Nail Salon API listening on http://localhost:${config.port}`);
   });
+  // Kick off the pre-appointment reminder sweep (no-op when notifications are
+  // off). Runs in-process; fine for a single-instance MVP.
+  startReminderSweeps();
 }
