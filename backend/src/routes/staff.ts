@@ -1,3 +1,5 @@
+// Routes for technicians: GET /api/staff lists active technicians, optionally
+// filtered to those who perform a given service (?serviceId=).
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 

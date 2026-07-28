@@ -1,3 +1,7 @@
+// Application entry point. Builds the Express app — CORS, body parsing, and all
+// route mounting — and, when run directly (not under tests), starts listening
+// and kicks off the background sweeps (reminders, stale-pending reaper). The
+// Stripe webhook is mounted before express.json() so it can read the raw body.
 import express from 'express';
 import cors from 'cors';
 import { config } from './lib/config';

@@ -1,3 +1,8 @@
+// Central configuration. Reads process.env once (via dotenv) and exposes a
+// single typed `config` object for the rest of the app — including derived
+// *Enabled flags that encode the free-first rule: a feature is on only when its
+// keys are present, otherwise it silently no-ops. Nothing else should read
+// process.env directly.
 import 'dotenv/config';
 
 function num(name: string, fallback: number): number {

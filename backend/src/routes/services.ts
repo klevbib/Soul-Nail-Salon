@@ -1,3 +1,5 @@
+// Routes for the service catalogue: GET /api/services lists the bookable
+// services the frontend offers in step 1 of the widget.
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 

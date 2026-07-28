@@ -1,3 +1,5 @@
+// Route for creating bookings: POST /api/bookings validates the request body
+// and delegates to services/booking.ts (which holds the double-booking guard).
 import { Router } from 'express';
 import { z } from 'zod';
 import { createBooking, BookingError } from '../services/booking';

@@ -1,3 +1,7 @@
+// Stripe routes: GET /api/stripe/config tells the frontend whether deposits are
+// on (and the publishable key), and POST /api/stripe/webhook receives Stripe
+// events. The webhook needs the raw request body for signature verification, so
+// it applies express.raw() here and is mounted before express.json() in index.ts.
 import { Router, raw } from 'express';
 import { getStripe } from '../lib/stripe';
 import { config } from '../lib/config';

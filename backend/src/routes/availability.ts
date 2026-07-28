@@ -1,3 +1,6 @@
+// Route for open slots: GET /api/availability?serviceId=&staffId=&date= returns
+// the bookable start times for a day. Thin HTTP shell around the pure
+// availability engine in services/availability.ts.
 import { Router } from 'express';
 import { z } from 'zod';
 import { getAvailability, AvailabilityError } from '../services/availability';
