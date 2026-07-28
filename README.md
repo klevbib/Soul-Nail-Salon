@@ -1,20 +1,26 @@
 # Soul Nail Salon
 
-A simple, elegant static website for **Soul Nail Salon**, a boutique nail salon
-in Altrincham. The site presents the salon's services, portfolio, and story, and
-points visitors toward booking by phone or walk-in.
+A website and **online booking system** for **Soul Nail Salon**, a boutique nail
+salon in Altrincham. Visitors can browse services, portfolio, and story, then
+book an appointment online — picking a service, technician, and time, paying a
+deposit, and receiving email/SMS confirmations. Salon staff manage bookings
+through a lightweight admin dashboard.
 
-Plain HTML, CSS, and vanilla JavaScript — no build step, no dependencies to
-install, no backend. It can be hosted on any static host (GitHub Pages, Netlify,
-Cloudflare Pages, S3, etc.).
+The project has two parts:
+
+- **`frontend/`** — the public site: plain HTML, CSS, and vanilla JavaScript, no
+  build step. Hostable on any static host. Talks to the API over `fetch`.
+- **`backend/`** — a Node + Express + Prisma API that powers booking,
+  availability, deposits, notifications, and the admin dashboard.
+
+The frontend still works as a plain static site on its own; the booking widget
+degrades gracefully to a "call us" message when the API isn't reachable.
 
 ---
 
 ## Running locally
 
-Because everything is static, you can just open `frontend/index.html` in a
-browser. To exercise the page-to-page navigation and relative asset paths
-exactly as they'll behave when hosted, serve the `frontend/` folder instead:
+### Frontend (static site)
 
 ```bash
 cd frontend
@@ -22,7 +28,92 @@ python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
 
-Any static file server works equally well (e.g. `npx serve`).
+Any static file server works (e.g. `npx serve`). The booking widget expects the
+API at `http://localhost:4000` in local dev (see `frontend/js/booking.js`).
+
+### Backend (booking API)
+
+```bash
+cd backend
+npm install
+cp .env.example .env         # then fill in anything you want to enable
+npm run migrate              # create the local SQLite database
+npm run seed                 # load services, staff, and opening hours
+npm run dev                  # API on http://localhost:4000
+```
+
+Serve the frontend on **port 8000** alongside it — that origin is in the API's
+dev CORS allowlist (`CORS_ORIGIN` in `.env`). Then walk the flow at
+`http://localhost:8000`: pick a service → technician → time → book.
+
+**Free-first principle:** every feature is built, but the paid/external
+providers (Stripe, Resend, Twilio) stay **disabled** until you add their keys.
+With the keys blank, bookings confirm instantly with no card and no messages —
+so the whole system runs locally for free. Going live is just swapping in real
+keys.
+
+Useful backend scripts:
+
+| Command | What it does |
+| ------- | ------------ |
+| `npm run dev` | Start the API with hot reload |
+| `npm test` | Run the unit-test suite (Vitest) |
+| `npm run migrate` | Apply Prisma migrations to the dev database |
+| `npm run seed` | Seed services / staff / opening hours |
+| `npm run admin:hash -- "your-password"` | Generate an admin password hash for `.env` |
+
+---
+
+## The booking system
+
+Built in five independently-shippable phases (all complete):
+
+1. **Backend + data** — Express app, Prisma schema (Service, Staff,
+   BusinessHours, TimeOff, Booking), seed data, and a unit-tested availability
+   engine. `GET /api/services`, `/staff`, `/availability`.
+2. **Core booking** — `POST /api/bookings` with a double-booking guard
+   (Serializable transaction), plus the multi-step booking widget in the
+   homepage accordion.
+3. **Deposits** — Stripe Payment Intents + webhook; a booking is held `pending`
+   until the deposit succeeds. Enabled by setting `STRIPE_SECRET_KEY`.
+4. **Notifications** — confirmation email (Resend) + SMS (Twilio), and a
+   pre-appointment reminder job. Each channel switches on independently via its
+   keys.
+5. **Admin dashboard** — a secure, staff-only page to view/filter bookings,
+   cancel or complete them, and block off technician time. A background reaper
+   also cancels abandoned `pending` bookings so held slots free up.
+
+### API surface
+
+| Method & path | Purpose |
+| ------------- | ------- |
+| `GET /api/services` | List bookable services |
+| `GET /api/staff?serviceId=` | Technicians (optionally for a service) |
+| `GET /api/availability?serviceId=&staffId=&date=` | Open slots for a day |
+| `POST /api/bookings` | Create a booking |
+| `GET /api/stripe/config`, `POST /api/stripe/webhook` | Deposit flow |
+| `POST /api/admin/login` · `/logout` · `GET /api/admin/me` | Admin auth |
+| `GET/PATCH /api/admin/bookings` | View / cancel / complete bookings |
+| `GET/POST/DELETE /api/admin/timeoff` | Manage technician time off |
+
+### Admin dashboard
+
+Served at `frontend/admin.html` (staff-only, `noindex`). Authentication is a
+single shared password, handled securely:
+
+- the password is never stored — only a **scrypt hash** (`ADMIN_PASSWORD_HASH`);
+- login issues an **HMAC-signed session in an HttpOnly, SameSite=Strict cookie**,
+  so it can't be read by JavaScript or replayed cross-site;
+- logins are **rate-limited**, and the whole admin surface **fails closed** —
+  every endpoint returns `503` until `ADMIN_PASSWORD_HASH` and `SESSION_SECRET`
+  are set.
+
+Set it up with:
+
+```bash
+cd backend
+npm run admin:hash -- "a-strong-password"   # prints the two lines to add to .env
+```
 
 ---
 
@@ -32,72 +123,72 @@ Any static file server works equally well (e.g. `npx serve`).
 Soul-Nail-Salon/
 ├── README.md
 ├── .gitignore
-└── frontend/                     # Everything the site needs is served from here
-    ├── index.html                # Homepage: hero + "Let's get started" accordion
-    ├── portfolio.html            # Filterable image gallery + lightbox
-    ├── about.html                # Salon story and values
-    ├── privacy-policy.html       # Legal: privacy policy
-    ├── terms-and-conditions.html # Legal: terms & conditions
-    ├── css/
-    │   └── style.css             # Single global stylesheet for all pages
-    ├── js/
-    │   ├── transitions.js        # Loaded everywhere: page fade + mobile nav
-    │   ├── home.js               # index.html "Let's get started" accordion
-    │   └── portfolio.js          # portfolio.html filtering + lightbox
-    └── assets/
-        ├── other/                # Logos, posters
-        └── portfolio/            # Nail art photos shown in the gallery
+├── frontend/                     # Public static site (+ admin page)
+│   ├── index.html                # Homepage: hero + booking accordion
+│   ├── admin.html                # Staff-only bookings dashboard
+│   ├── portfolio.html            # Filterable image gallery + lightbox
+│   ├── about.html                # Salon story and values
+│   ├── privacy-policy.html       # Legal pages
+│   ├── terms-and-conditions.html
+│   ├── css/style.css             # Single global stylesheet
+│   ├── js/
+│   │   ├── transitions.js        # Page fade + mobile nav (loaded everywhere)
+│   │   ├── home.js               # Homepage accordion
+│   │   ├── booking.js            # Multi-step booking widget (calls the API)
+│   │   ├── admin.js              # Admin dashboard logic
+│   │   └── portfolio.js          # Gallery filtering + lightbox
+│   └── assets/                   # Logos, posters, portfolio photos
+└── backend/                      # Booking API (Node + Express + Prisma)
+    ├── prisma/                   # schema.prisma, migrations, seed
+    ├── scripts/hash-password.ts  # Admin password-hash generator
+    └── src/
+        ├── index.ts              # App wiring (routes, CORS, jobs)
+        ├── lib/                  # config, prisma, auth, providers, rate limit
+        ├── routes/               # services, staff, availability, bookings,
+        │                         #   stripe, admin
+        ├── services/             # booking, availability, payments,
+        │                         #   notifications, admin (business logic)
+        ├── middleware/           # requireAdmin (auth gate)
+        └── jobs/                 # reminders + stale-pending reaper
 ```
-
-Each page loads `transitions.js`; the homepage and portfolio additionally load
-their own page-specific script.
-
----
-
-## How it fits together
-
-- **Shared UI** — the dismissible top banner, navigation bar, and footer are
-  duplicated as plain markup at the top/bottom of every HTML page. There's no
-  templating, so a change to any of them must be applied to each page.
-- **Styling** — one hand-written `css/style.css` covers every page. It opens
-  with a documented colour palette and a numbered table of contents; each major
-  section carries a matching numbered header. Responsive rules for tablet
-  (≤1024px) and mobile (≤768px) live at the bottom.
-- **JavaScript** — small, dependency-free, and split by responsibility:
-  - `transitions.js` — fades between internal pages and drives the mobile
-    hamburger menu.
-  - `home.js` — the homepage accordion (`togglePanel`).
-  - `portfolio.js` — gallery category filtering and the lightbox.
-
-  The page-specific handlers are invoked from inline `onclick`/`onkeydown`
-  attributes in the markup, so those functions are intentionally global.
-- **Icons & fonts** — [Boxicons](https://boxicons.com/) and the Hanken Grotesk
-  Google Font are loaded from CDNs, so an internet connection is needed for them
-  to render.
 
 ---
 
 ## Tech stack
 
-| Choice     | Reason                                                         |
-| ---------- | -------------------------------------------------------------- |
-| HTML       | Simple, no build step, easy to hand off or host anywhere       |
-| CSS        | Hand-written styles, full control, no dependencies             |
-| JavaScript | Vanilla JS for interactivity (filter, lightbox, transitions)   |
-| No backend | Fully static; all content is hardcoded in the HTML             |
+| Layer | Choice | Reason |
+| ----- | ------ | ------ |
+| Frontend | HTML / CSS / vanilla JS, no build | Simple, fast, host anywhere |
+| API | Node + Express (TypeScript) | Small, well-understood, easy to deploy |
+| ORM / DB | Prisma; SQLite (dev) / Postgres (prod) | One schema, portable |
+| Payments | Stripe (deposits) | Env-gated, off by default |
+| Email / SMS | Resend / Twilio | Env-gated, off by default |
+| Tests | Vitest | Pure business logic is unit-tested |
+| Hosting (planned) | Render (web + Postgres) | One dashboard, always-on, simple deploys |
 
-> **Future path:** migrate to a framework (React, Next.js, Astro) if the site
-> grows or the shared banner/nav/footer duplication becomes hard to maintain.
+---
+
+## Deploying (going live)
+
+The code is complete; going live is configuration only:
+
+1. Set a real admin password (`npm run admin:hash`) and a random `SESSION_SECRET`.
+2. Add live keys for any providers you want on (Stripe / Resend / Twilio).
+3. Point `DATABASE_URL` at Postgres and switch the Prisma datasource provider.
+4. Deploy the backend to Render (or similar) with `NODE_ENV=production` — this
+   also enables the `Secure` flag on the session cookie.
+5. Serve the frontend from the same origin (the API is under `/api` in prod).
 
 ---
 
 ## Editing content
 
-- **Services & pricing** — the services list on `index.html` (`#panel-services`).
-- **Contact details, address, hours** — appear in the nav/panels/footer of every
-  page; update them everywhere they occur.
+- **Services & pricing** — seeded in `backend/prisma/seed.ts` (the source of
+  truth the booking API reads). The static list on `index.html` mirrors it.
+- **Technicians & opening hours** — also in the seed; block off individual
+  time via the admin dashboard.
+- **Contact details, address** — appear in the nav/panels/footer of every page;
+  update them everywhere they occur (no templating).
 - **Portfolio images** — add a `.png` to `frontend/assets/portfolio/`, then add a
-  matching `.gallery-item` in `portfolio.html`. Set `data-category` to one of
-  `manicure`, `nail-art`, `gel`, or `acrylic` so the filter buttons include it.
-- **Booking** — currently phone/walk-in only; there is no online booking
-  integration yet.
+  matching `.gallery-item` in `portfolio.html` with `data-category` set to one of
+  `manicure`, `nail-art`, `gel`, or `acrylic`.
