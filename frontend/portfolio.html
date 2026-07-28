@@ -115,8 +115,10 @@
 
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
-        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+        <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)" aria-label="Previous image">&#10094;</button>
         <img id="lightbox-img" src="" alt="">
+        <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)" aria-label="Next image">&#10095;</button>
     </div>
 
     <footer>

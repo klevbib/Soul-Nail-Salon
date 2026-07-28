@@ -28,6 +28,10 @@ yarn-error.log*
 dist/
 build/
 
+# Local SQLite dev database (backend Prisma)
+*.db
+*.db-journal
+
 # Claude Code
 .claude/
 

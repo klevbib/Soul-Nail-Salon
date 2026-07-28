@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin — Soul Nail Salon</title>
+    <script src="js/admin.js" defer></script>
+
+    <!-- Staff-only dashboard. Kept a self-contained page (its own styles, no site
+         chrome) since it's an internal tool, but reuses the site's palette/font. -->
+    <style>
+        :root {
+            --cream: #F6F3EC;
+            --terracotta: #C25B3D;
+            --terracotta-hover: #B05235;
+            --ink: #1B1815;
+            --sand: #D9D1C3;
+            --grey: #5C554F;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hanken Grotesk', sans-serif; }
+        body { background: var(--cream); color: var(--ink); line-height: 1.5; }
+        .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
+
+        header.bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        header.bar h1 { font-size: 1.4rem; font-weight: 700; }
+        header.bar .sub { color: var(--grey); font-size: 0.85rem; }
+
+        button {
+            background: var(--terracotta); color: #fff; border: none; border-radius: 8px;
+            padding: 9px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+        }
+        button:hover { background: var(--terracotta-hover); }
+        button.ghost { background: transparent; color: var(--terracotta); border: 1px solid var(--sand); }
+        button.ghost:hover { background: #efe9dd; }
+        button:disabled { opacity: 0.5; cursor: default; }
+        button.small { padding: 5px 10px; font-size: 0.8rem; }
+
+        /* Login */
+        #login { max-width: 360px; margin: 12vh auto 0; text-align: center; }
+        #login h1 { margin-bottom: 6px; }
+        #login p { color: var(--grey); margin-bottom: 20px; }
+        #login form { display: flex; flex-direction: column; gap: 12px; }
+        input, select {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--sand);
+            border-radius: 8px; font-size: 0.95rem; background: #fff; color: var(--ink);
+        }
+
+        section.card {
+            background: #fff; border: 1px solid var(--sand); border-radius: 12px;
+            padding: 20px; margin-bottom: 24px;
+        }
+        section.card h2 { font-size: 1.05rem; margin-bottom: 14px; }
+
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 16px; }
+        .filters label { display: flex; flex-direction: column; font-size: 0.75rem; color: var(--grey); gap: 4px; }
+        .filters label select, .filters label input { width: auto; min-width: 150px; }
+
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--sand); white-space: nowrap; }
+        th { font-weight: 600; color: var(--grey); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        td .muted { color: var(--grey); font-size: 0.8rem; }
+
+        .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
+        .pill.confirmed { background: #dff0e3; color: #1f7a3d; }
+        .pill.pending   { background: #fbeecf; color: #8a6400; }
+        .pill.cancelled { background: #f4dcd6; color: #a3391f; }
+        .pill.completed { background: #e0e0ea; color: #43436b; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end; }
+        .form-grid label { display: flex; flex-direction: column; font-size: 0.75rem; color: var(--grey); gap: 4px; }
+
+        .msg { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-top: 10px; display: none; }
+        .msg.err { background: #f4dcd6; color: #a3391f; display: block; }
+        .msg.ok  { background: #dff0e3; color: #1f7a3d; display: block; }
+        .empty { color: var(--grey); padding: 16px 0; }
+        .hidden { display: none; }
+    </style>
+</head>
+
+<body>
+    <!-- Login view -->
+    <div id="login" class="wrap">
+        <h1>Soul Nail Salon</h1>
+        <p>Staff dashboard — please sign in.</p>
+        <form id="login-form">
+            <input type="password" id="password" placeholder="Admin password" autocomplete="current-password" required>
+            <button type="submit">Sign in</button>
+        </form>
+        <div id="login-msg" class="msg"></div>
+    </div>
+
+    <!-- Dashboard view -->
+    <div id="dashboard" class="wrap hidden">
+        <header class="bar">
+            <div>
+                <h1>Bookings dashboard</h1>
+                <div class="sub">Soul Nail Salon</div>
+            </div>
+            <button id="logout" class="ghost small">Sign out</button>
+        </header>
+
+        <section class="card">
+            <h2>Bookings</h2>
+            <div class="filters">
+                <label>Status
+                    <select id="filter-status">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </label>
+                <label>From
+                    <input type="date" id="filter-from">
+                </label>
+                <label>To
+                    <input type="date" id="filter-to">
+                </label>
+                <button id="apply-filters" class="small">Apply</button>
+                <button id="clear-filters" class="ghost small">Clear</button>
+            </div>
+            <div id="bookings-msg" class="msg"></div>
+            <div class="table-scroll">
+                <table id="bookings-table">
+                    <thead>
+                        <tr>
+                            <th>When</th><th>Service</th><th>Technician</th>
+                            <th>Customer</th><th>Status</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-body"></tbody>
+                </table>
+            </div>
+            <div id="bookings-empty" class="empty hidden">No bookings match these filters.</div>
+        </section>
+
+        <section class="card">
+            <h2>Add time off</h2>
+            <p class="sub" style="margin-bottom:14px;color:var(--grey);font-size:0.82rem;">
+                Block a technician's calendar (holiday, break) so those slots can't be booked.
+            </p>
+            <form id="timeoff-form" class="form-grid">
+                <label>Technician
+                    <select id="to-staff" required></select>
+                </label>
+                <label>Start
+                    <input type="datetime-local" id="to-start" required>
+                </label>
+                <label>End
+                    <input type="datetime-local" id="to-end" required>
+                </label>
+                <label>Reason (optional)
+                    <input type="text" id="to-reason" maxlength="200" placeholder="Holiday">
+                </label>
+                <button type="submit">Add time off</button>
+            </form>
+            <div id="timeoff-msg" class="msg"></div>
+
+            <div class="table-scroll" style="margin-top:18px;">
+                <table>
+                    <thead>
+                        <tr><th>Technician</th><th>From</th><th>To</th><th>Reason</th><th></th></tr>
+                    </thead>
+                    <tbody id="timeoff-body"></tbody>
+                </table>
+            </div>
+            <div id="timeoff-empty" class="empty hidden">No upcoming time off.</div>
+        </section>
+    </div>
+</body>
+
+</html>
