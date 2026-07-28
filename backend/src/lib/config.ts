@@ -21,6 +21,14 @@ const twilioFromNumber = (process.env.TWILIO_FROM_NUMBER ?? '').trim();
 const emailEnabled = resendApiKey !== '';
 const smsEnabled = twilioAccountSid !== '' && twilioAuthToken !== '' && twilioFromNumber !== '';
 
+// ---- Admin (Phase 5) ----
+// The dashboard fails CLOSED: unless BOTH a password hash and a session secret
+// are configured, every admin endpoint returns 503 rather than allowing
+// unauthenticated access. Generate the hash with `npm run admin:hash`.
+const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH ?? '').trim();
+const sessionSecret = (process.env.SESSION_SECRET ?? '').trim();
+const adminEnabled = adminPasswordHash !== '' && sessionSecret !== '';
+
 export const config = {
   port: num('PORT', 4000),
   corsOrigins: (process.env.CORS_ORIGIN ?? '')
@@ -29,7 +37,17 @@ export const config = {
     .filter(Boolean),
   minLeadMinutes: num('MIN_LEAD_MINUTES', 60),
   slotGranularityMinutes: num('SLOT_GRANULARITY_MINUTES', 15),
-  adminToken: process.env.ADMIN_TOKEN ?? '',
+
+  // ---- Admin dashboard (Phase 5) ----
+  adminPasswordHash,
+  sessionSecret,
+  adminEnabled,
+  // How long an admin login stays valid before re-login is required.
+  adminSessionHours: num('ADMIN_SESSION_HOURS', 12),
+  // Set the cookie's `Secure` flag in production (HTTPS on Render). Off in dev
+  // so the session cookie works over http://localhost. Browsers treat
+  // SameSite=Strict as CSRF protection either way.
+  cookieSecure: (process.env.NODE_ENV ?? '') === 'production',
 
   // ---- Stripe deposits (Phase 3) ----
   // Free-first: with no secret key, payments are disabled and a booking is
@@ -61,4 +79,12 @@ export const config = {
   // window [now, now + reminderLeadHours].
   reminderLeadHours: num('REMINDER_LEAD_HOURS', 24),
   reminderSweepMinutes: num('REMINDER_SWEEP_MINUTES', 15),
+
+  // ---- Stale-pending reaper (Phase 5) ----
+  // Only relevant when deposits are on: a booking sits 'pending' (holding its
+  // slot) until Stripe confirms payment. If the customer abandons checkout the
+  // slot would be held forever, so a sweep cancels pending bookings older than
+  // pendingHoldMinutes, freeing the slot. No-op when payments are disabled.
+  pendingHoldMinutes: num('PENDING_HOLD_MINUTES', 30),
+  reaperSweepMinutes: num('REAPER_SWEEP_MINUTES', 10),
 };

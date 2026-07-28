@@ -6,7 +6,9 @@ import { staffRouter } from './routes/staff';
 import { availabilityRouter } from './routes/availability';
 import { bookingsRouter } from './routes/bookings';
 import { stripeRouter } from './routes/stripe';
+import { adminRouter } from './routes/admin';
 import { startReminderSweeps } from './jobs/reminders';
+import { startReaperSweeps } from './jobs/reaper';
 
 export function createApp() {
   const app = express();
@@ -14,6 +16,10 @@ export function createApp() {
   app.use(
     cors({
       origin: config.corsOrigins.length > 0 ? config.corsOrigins : true,
+      // The admin dashboard authenticates with a cookie, so the browser must be
+      // allowed to send credentials. This requires an explicit origin allowlist
+      // (not "*") — which config.corsOrigins provides.
+      credentials: true,
     }),
   );
 
@@ -33,6 +39,7 @@ export function createApp() {
   app.use('/api/staff', staffRouter);
   app.use('/api/availability', availabilityRouter);
   app.use('/api/bookings', bookingsRouter);
+  app.use('/api/admin', adminRouter);
 
   // Centralised error handler.
   app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -54,4 +61,7 @@ if (require.main === module) {
   // Kick off the pre-appointment reminder sweep (no-op when notifications are
   // off). Runs in-process; fine for a single-instance MVP.
   startReminderSweeps();
+  // Cancel abandoned pending bookings so held slots free up (no-op when deposits
+  // are off — there are no pending bookings then).
+  startReaperSweeps();
 }
